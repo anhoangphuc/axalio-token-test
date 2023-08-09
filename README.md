@@ -6,19 +6,19 @@ within feature branch. All feature branch are push and Pull Request (PR) is crea
 
 ### What is this repository for? ###
 
-* See above
+* Smart contracts, COSMWASM
 * v 0.9.9
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
 ### How do I get set up? ###
 
-* CLONE REPO - git clone https://axalio-dev-admin@bitbucket.org/axalio-dev/axalio.git
+* CLONE REPO - git clone https://axalio-dev-admin@bitbucket.org/axalio-dev/axalio-dev-coreum-smartcontracts.git
 
 * Step 1: Switch to your repository's directory
 	cd /path/to/your/repo
 	
 * SStep 2: Connect your existing repository to Bitbucket
-	git remote add origin https://axalio-dev-admin@bitbucket.org/axalio-dev/axalio.git
+	git remote add origin https://axalio-dev-admin@bitbucket.org/axalio-dev/axalio-dev-coreum-smartcontracts.git
 	git push -u origin develop
 
 * How to run tests - TBD
