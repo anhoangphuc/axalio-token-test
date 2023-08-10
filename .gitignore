@@ -46,3 +46,8 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
+
+# Added by cargo
+
+/target
+/Cargo.lock
