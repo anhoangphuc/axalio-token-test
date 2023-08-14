@@ -1,18 +1,12 @@
-use std::fmt::format;
 use crate::msg::{AmountResponse, InstantiateMsg, ExecuteMsg, QueryMsg};
 use crate::error::ContractError;
 use crate::state::{STATE, State};
 use coreum_wasm_sdk::assetft;
 use coreum_wasm_sdk::core::{CoreumMsg, CoreumQueries};
-use cosmwasm_std::{entry_point, to_binary, Binary, Deps, QueryRequest, StdResult, QueryResponse};
+use cosmwasm_std::{entry_point, to_binary, Binary, Deps, QueryRequest, StdResult};
 use cosmwasm_std::{Coin, DepsMut, Env, MessageInfo, Response, Uint128};
 use cw2::set_contract_version;
-use cw_storage_plus::Item;
-use schemars::JsonSchema;
-use serde::{Serialize, Deserialize};
 use std::ops::{Add, Sub};
-use std::os::macos::raw::stat;
-use thiserror::Error;
 
 const CONTRACT_NAME: &str = "axalio-ft";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
