@@ -64,3 +64,6 @@ artifacts/
 
 # Ignores local beaker state
 **/state.local.json
+
+# Environment file
+.env
