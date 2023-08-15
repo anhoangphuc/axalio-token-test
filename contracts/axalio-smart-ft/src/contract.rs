@@ -22,7 +22,7 @@ pub fn query(deps: Deps<CoreumQueries>, _env: Env, msg: QueryMsg) -> StdResult<B
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
-    deps: DepsMut,
+    deps: DepsMut<CoreumQueries>,
     _env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
@@ -35,7 +35,7 @@ pub fn execute(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
-    deps: DepsMut,
+    deps: DepsMut<CoreumQueries>,
     env: Env,
     info: MessageInfo,
     msg: InstantiateMsg,
@@ -72,7 +72,7 @@ pub fn instantiate(
 // ********** TRANSACTIONS **********
 
 fn mint_for_airdrop(
-    deps: DepsMut,
+    deps: DepsMut<CoreumQueries>,
     info: MessageInfo,
     amount: u128,
 ) -> Result<Response<CoreumMsg>, ContractError> {
@@ -96,7 +96,7 @@ fn mint_for_airdrop(
     )
 }
 
-fn receive_airdrop(deps: DepsMut, info: MessageInfo) -> Result<Response<CoreumMsg>, ContractError> {
+fn receive_airdrop(deps: DepsMut<CoreumQueries>, info: MessageInfo) -> Result<Response<CoreumMsg>, ContractError> {
     let mut state = STATE.load(deps.storage)?;
     if state.minted_for_airdrop < state.airdrop_amount {
         return Err(ContractError::CustomError {
@@ -135,4 +135,34 @@ fn minted_for_airdrop(deps: Deps<CoreumQueries>) -> StdResult<Binary> {
         amount: state.minted_for_airdrop,
     };
     to_binary(&res)
+}
+
+#[cfg(test)]
+mod tests {
+    use cosmwasm_std::Addr;
+    use cw_multi_test::{App, ContractWrapper, Executor};
+    use super::*;
+
+    #[test]
+    fn token_query() {
+        let mut app = App::default();
+        let code = ContractWrapper::new(execute, instantiate, query);
+        let code_id = app.store_code(Box::new(code));
+
+        let addr = app.instantiate_contract(
+            code_id,
+            Addr::unchecked("owner"),
+            &InstantiateMsg {
+                symbol: "AXA".to_owned(),
+                subunit: "A".to_owned(),
+                precision: 6,
+                initial_amount: Uint128::new(1000000000),
+                airdrop_amount: Uint128::new(1000000),
+            },
+            &[],
+            "Contract",
+            None,
+        ).unwrap();
+        assert_eq!(addr, "1234");
+    }
 }
