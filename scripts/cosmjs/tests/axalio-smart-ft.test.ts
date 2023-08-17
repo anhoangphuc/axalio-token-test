@@ -11,17 +11,19 @@ import {stringToPath} from "@cosmjs/crypto";
 import {senderMnemonic} from "../scripts/utils";
 
 describe('Axalio smart ft', () => {
-    let wallet: DirectSecp256k1HdWallet;
+    let wallet: DirectSecp256k1HdWallet, userWallet: DirectSecp256k1HdWallet;
     let stargateClient: SigningStargateClient;
-    let wasmClient: SigningCosmWasmClient;
-    let admin: AccountData;
+    let wasmClient: SigningCosmWasmClient, userWasmClient: SigningCosmWasmClient;
+    let admin: AccountData, user: AccountData;
     let instantiateResult: InstantiateResult;
     beforeEach(async () => {
         const coreumEndpoint = process.env.ZNET_NODE || "";
         const coreumAccountPrefix = "devcore"; // the address prefix (different for different chains/environments)
         const coreumHDPath = "m/44'/990'/0'/0/0"; // coreum HD path (same for all chains/environments)
         wallet = await DirectSecp256k1HdWallet.fromMnemonic(process.env.ZNET_MNEMONIC || "", { prefix: coreumAccountPrefix, hdPaths: [stringToPath(coreumHDPath)]});
+        userWallet = await DirectSecp256k1HdWallet.fromMnemonic(process.env.ZNET_USER_MNEMONIC || "", { prefix: coreumAccountPrefix, hdPaths: [stringToPath(coreumHDPath)]});
         [admin] = await  wallet.getAccounts();
+        [user] = await userWallet.getAccounts();
         stargateClient = await SigningStargateClient.connectWithSigner(coreumEndpoint, wallet);
 
         const coreumClient = await coreum.ClientFactory.createRPCQueryClient({ rpcEndpoint: coreumEndpoint });
@@ -37,6 +39,13 @@ describe('Axalio smart ft', () => {
                 gasPrice,
             }
         );
+        userWasmClient = await SigningCosmWasmClient.connectWithSigner(
+            coreumEndpoint,
+            userWallet,
+            {
+                gasPrice,
+            },
+        )
         const axalioWasm = await readFile("../../target/wasm32-unknown-unknown/release/axalio_smart_ft.wasm");
         const { codeId } = await wasmClient.upload(admin.address, axalioWasm, 'auto', 'Axalio-smart-ft');
         const instantiateMsg: InstantiateMsg = { airdrop_amount: "1000000", initial_amount: "100000000", precision: 6, subunit: "uaxa", symbol: "AXA" };
@@ -59,5 +68,14 @@ describe('Axalio smart ft', () => {
         const mintedForAirdropMsg: QueryMsg = { minted_for_airdrop: {} };
         const mintedForAirdrop = await wasmClient.queryContractSmart(instantiateResult.contractAddress, mintedForAirdropMsg);
         expect(mintedForAirdrop.amount).to.be.eq("200000000");
-    })
+    });
+
+    it(`Mint for airdrop unauthorized`, async  () => {
+        try {
+            const mintForAirdropMsg: ExecuteMsg = { mint_for_airdrop: { amount: "100000000" }};
+            await userWasmClient.execute(user.address, instantiateResult.contractAddress, mintForAirdropMsg, "auto" );
+        } catch (e) {
+            expect((e as any).toString().includes("Unauthorized: execute wasm contract failed"));
+        }
+    });
 })
