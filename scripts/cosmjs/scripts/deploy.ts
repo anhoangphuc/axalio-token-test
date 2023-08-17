@@ -1,7 +1,7 @@
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { InstantiateMsg, ExecuteMsg } from "../ts/AxalioSmartFT.types";
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import { senderMnemonic, coreumRpcEndpoint, coreumDenom, calculateGasPrice, generateKey } from "./utils";
 
 const main = async () => {
@@ -36,6 +36,8 @@ const main = async () => {
         ]
     });
     console.log("Instantiate result:", { instantiateResult });
+
+    await writeFile(__dirname + "/../axalio_smart_ft.address", instantiateResult.contractAddress);
 
     // mint for airdrop
     const mintForAirdrop: ExecuteMsg = { mint_for_airdrop: { amount: "1000000" } };

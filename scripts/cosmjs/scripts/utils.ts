@@ -27,6 +27,6 @@ export const calculateGasPrice = async (): Promise<GasPrice> => {
         afterBlocks: 10
     })
     console.log("Fee:", fee)
-    const gasPrice = GasPrice.fromString(`${decodeCosmosSdkDecFromProto(fee.minGasPrice.amount).toFloatApproximation()}${fee.minGasPrice.denom || ""}`);
+    const gasPrice = GasPrice.fromString(`${decodeCosmosSdkDecFromProto(fee.minGasPrice.amount).toFloatApproximation() * 1.1}${fee.minGasPrice.denom || ""}`);
     return gasPrice;
 }

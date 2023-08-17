@@ -3,6 +3,7 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { ExecuteMsg } from "../ts/AxalioSmartFT.types";
 import { calculateGasPrice, coreumRpcEndpoint, generateKey, senderMnemonic } from './utils';
+import { readFile } from 'fs/promises';
 
 const main = async () => {
     const wallet = await generateKey(senderMnemonic)
@@ -26,7 +27,7 @@ const main = async () => {
         }
     );
 
-    const contractAddress = "testcore1c2c9qkpyt0mp0vzr6vgd22l72snvfngqnfwf9ka6aqsg7dlcxcesjwjpgu";
+    const contractAddress = await readFile(__dirname+ "/../axalio_smart_ft.address", "utf-8");
 
     // mint for airdrop
     const mintForAirdrop: ExecuteMsg = { mint_for_airdrop: { amount: "1000000" } };
