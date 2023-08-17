@@ -5,9 +5,10 @@ import {AccountData, DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
 import {decodeCosmosSdkDecFromProto, GasPrice, SigningStargateClient} from "@cosmjs/stargate";
 import {InstantiateResult, SigningCosmWasmClient} from "@cosmjs/cosmwasm-stargate";
 import {readFile} from "fs/promises";
-import {InstantiateMsg} from "../ts/AxalioSmartFT.types";
+import {ExecuteMsg, InstantiateMsg, QueryMsg} from "../ts/AxalioSmartFT.types";
 import {coreum} from "coreum";
 import {stringToPath} from "@cosmjs/crypto";
+import {senderMnemonic} from "../scripts/utils";
 
 describe('Axalio smart ft', () => {
     let wallet: DirectSecp256k1HdWallet;
@@ -36,7 +37,7 @@ describe('Axalio smart ft', () => {
                 gasPrice,
             }
         );
-        const axalioWasm = await readFile("../../artifacts/axalio_smart_ft.wasm");
+        const axalioWasm = await readFile("../../target/wasm32-unknown-unknown/release/axalio_smart_ft.wasm");
         const { codeId } = await wasmClient.upload(admin.address, axalioWasm, 'auto', 'Axalio-smart-ft');
         const instantiateMsg: InstantiateMsg = { airdrop_amount: "1000000", initial_amount: "100000000", precision: 6, subunit: "uaxa", symbol: "AXA" };
         instantiateResult = await wasmClient.instantiate(admin.address, codeId, instantiateMsg, "axalio-smart-ft", "auto", {
@@ -51,4 +52,12 @@ describe('Axalio smart ft', () => {
         expect(chainId).to.be.eq("coreum-devnet-1");
         expect(instantiateResult.height).to.be.gt(1);
     });
+
+    it(`Mint for airdrop success`, async () => {
+        const mintForAirdropMsg: ExecuteMsg = { mint_for_airdrop: { amount: "100000000" }};
+        await wasmClient.execute(admin.address, instantiateResult.contractAddress, mintForAirdropMsg, "auto" );
+        const mintedForAirdropMsg: QueryMsg = { minted_for_airdrop: {} };
+        const mintedForAirdrop = await wasmClient.queryContractSmart(instantiateResult.contractAddress, mintedForAirdropMsg);
+        expect(mintedForAirdrop.amount).to.be.eq("200000000");
+    })
 })
