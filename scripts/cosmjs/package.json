@@ -23,8 +23,16 @@
     "@cosmjs/math": "^0.31.0",
     "@cosmjs/proto-signing": "^0.31.0",
     "@cosmjs/stargate": "^0.31.0",
+    "@types/cacheable-request": "^8.3.2",
+    "@types/chai": "^4.3.5",
+    "@types/mocha": "^10.0.1",
+    "chai": "^4.3.7",
     "coreum": "^0.1.0",
     "cosmjs-types": "^0.8.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "mocha": "^10.2.0"
+  },
+  "scripts": {
+    "test": "tsc && mocha ./dist/tests/*.js"
   }
 }
