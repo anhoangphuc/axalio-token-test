@@ -78,4 +78,12 @@ describe('Axalio smart ft', () => {
             expect((e as any).toString().includes("Unauthorized: execute wasm contract failed"));
         }
     });
+
+    it(`Receive airdrop`, async () => {
+        const receiveAirdropMsg: ExecuteMsg = { receive_airdrop: {}};
+        await userWasmClient.execute(user.address, instantiateResult.contractAddress, receiveAirdropMsg, "auto");
+        const denom = `uaxa-${instantiateResult.contractAddress}`;
+        const balance = await stargateClient.getBalance(user.address, denom);
+        expect(balance.amount).to.be.eq('1000000');
+    })
 })
