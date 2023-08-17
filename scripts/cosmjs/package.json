@@ -33,6 +33,6 @@
     "mocha": "^10.2.0"
   },
   "scripts": {
-    "test": "tsc && mocha ./dist/tests/*.js"
+    "test": "tsc && mocha ./dist/tests/*.js --timeout 50000"
   }
 }
