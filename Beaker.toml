@@ -1,1 +1,5 @@
 name = "axalio-contracts"
+
+[wasm]
+contract_dir = 'contracts'
+optimizer_version = '0.12.13'

@@ -1,0 +1,30 @@
+{
+  "name": "axalio-cosmjs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@cosmwasm/ts-codegen": "^0.35.3",
+    "@types/node": "^20.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "eslint": "^8.0.1",
+    "eslint-config-standard-with-typescript": "^37.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-promise": "^6.0.0",
+    "ts-node": "^10.9.1",
+    "ts-proto": "^1.156.3",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@cosmjs/amino": "^0.31.0",
+    "@cosmjs/cosmwasm-stargate": "^0.31.0",
+    "@cosmjs/crypto": "^0.31.0",
+    "@cosmjs/math": "^0.31.0",
+    "@cosmjs/proto-signing": "^0.31.0",
+    "@cosmjs/stargate": "^0.31.0",
+    "coreum": "^0.1.0",
+    "cosmjs-types": "^0.8.0",
+    "dotenv": "^16.3.1"
+  }
+}
