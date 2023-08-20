@@ -87,5 +87,27 @@ describe('Axalio smart ft', () => {
         const denom = `uaxa-${instantiateResult.contractAddress}`;
         const balance = await stargateClient.getBalance(user.address, denom);
         expect(balance.amount).to.be.eq('1000000');
+        const mintedForAirdropMsg: QueryMsg = { minted_for_airdrop: { user_addr: user.address } };
+        const mintedForAirdrop = await wasmClient.queryContractSmart(instantiateResult.contractAddress, mintedForAirdropMsg);
+        expect(mintedForAirdrop.amount).to.be.eq("0");
+    })
+
+    it(`Receive airdrop failed`, async () => {
+        const receiveAirdropMsg: ExecuteMsg = { receive_airdrop: {}};
+        try {
+            await userWasmClient.execute(user.address, instantiateResult.contractAddress, receiveAirdropMsg, "auto");
+        } catch (e) {
+            expect((e as any).toString().includes("not airdrop user: execute wasm contract failed"));
+        }
+
+        const mintForAirdropMsg: ExecuteMsg = { mint_for_airdrop: { amount: "1000000", user_addr: user.address }};
+        await wasmClient.execute(admin.address, instantiateResult.contractAddress, mintForAirdropMsg, "auto" );
+        await userWasmClient.execute(user.address, instantiateResult.contractAddress, receiveAirdropMsg, "auto");
+
+        try {
+            await userWasmClient.execute(user.address, instantiateResult.contractAddress, receiveAirdropMsg, "auto");
+        } catch (e) {
+            expect((e as any).toString().includes("already airdropped: execute wasm contract failed"));
+        }
     })
 })
