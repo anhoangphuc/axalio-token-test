@@ -30,7 +30,7 @@ const main = async () => {
     const contractAddress = await readFile(__dirname+ "/../axalio_smart_ft.address", "utf-8");
 
     // mint for airdrop
-    const mintForAirdrop: ExecuteMsg = { mint_for_airdrop: { amount: "1000000" } };
+    const mintForAirdrop: ExecuteMsg = { mint_for_airdrop: { amount: "1000000", user_addr: sender.address } };
 
     const mintResult = await senderClient.execute(sender.address, contractAddress, mintForAirdrop, "auto")
     console.log("Mint result:", { mintResult });
