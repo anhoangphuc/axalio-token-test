@@ -6,7 +6,6 @@
 
 export type Uint128 = string;
 export interface InstantiateMsg {
-  airdrop_amount: Uint128;
   initial_amount: Uint128;
   precision: number;
   subunit: string;

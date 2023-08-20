@@ -13,7 +13,6 @@ pub struct InstantiateMsg {
     pub subunit: String,
     pub precision: u32,
     pub initial_amount: Uint128,
-    pub airdrop_amount: Uint128,
 }
 
 #[cw_serde]

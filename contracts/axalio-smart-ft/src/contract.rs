@@ -153,46 +153,7 @@ fn minted_for_airdrop(deps: Deps<CoreumQueries>, user_addr: String) -> StdResult
     let airdrop_amount = AIRDROP_USER.load(deps.storage, &user_addr);
     let res = match airdrop_amount {
         Ok(x) => AmountResponse { amount: x },
-        _Err => AmountResponse { amount: Uint128::from(0 as u128) },
+        _ => AmountResponse { amount: Uint128::from(0 as u128) },
     };
     to_binary(&res)
-}
-
-#[cfg(test)]
-mod tests {
-    use cosmwasm_std::{Addr, Api, Storage};
-    use cw_multi_test::{BasicAppBuilder, ContractWrapper, Executor, Router};
-    use super::*;
-
-    fn no_init<BankT, CustomT, WasmT, StakingT, DistrT>(
-        _: &mut Router<BankT, CustomT, WasmT, StakingT, DistrT>,
-        _: &dyn Api,
-        _: &mut dyn Storage,
-    ) {
-    }
-
-    #[test]
-    fn token_query() {
-        let mut app = BasicAppBuilder::<CoreumMsg, CoreumQueries>::new_custom()
-            .build(no_init);
-        let code = ContractWrapper::new(execute, instantiate, query);
-        let code_id = app.store_code(Box::new(code));
-
-        let addr = app.instantiate_contract(
-            code_id,
-            Addr::unchecked("owner"),
-            &InstantiateMsg {
-                symbol: "AXA".to_owned(),
-                subunit: "A".to_owned(),
-                precision: 6,
-                initial_amount: Uint128::new(1000000000),
-                airdrop_amount: Uint128::new(1000000),
-            },
-            &[],
-            "Contract",
-            None,
-        ).unwrap();
-        println!("Address is {}", addr.to_string());
-        assert_ne!(addr, "");
-    }
 }

@@ -48,7 +48,7 @@ describe('Axalio smart ft', () => {
         )
         const axalioWasm = await readFile("../../target/wasm32-unknown-unknown/release/axalio_smart_ft.wasm");
         const { codeId } = await wasmClient.upload(admin.address, axalioWasm, 'auto', 'Axalio-smart-ft');
-        const instantiateMsg: InstantiateMsg = { airdrop_amount: "1000000", initial_amount: "100000000", precision: 6, subunit: "uaxa", symbol: "AXA" };
+        const instantiateMsg: InstantiateMsg = { initial_amount: "100000000", precision: 6, subunit: "uaxa", symbol: "AXA" };
         instantiateResult = await wasmClient.instantiate(admin.address, codeId, instantiateMsg, "axalio-smart-ft", "auto", {
             funds: [
                 { amount: "10000000", denom: 'udevcore' }

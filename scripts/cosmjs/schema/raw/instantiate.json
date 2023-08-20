@@ -3,16 +3,12 @@
   "title": "InstantiateMsg",
   "type": "object",
   "required": [
-    "airdrop_amount",
     "initial_amount",
     "precision",
     "subunit",
     "symbol"
   ],
   "properties": {
-    "airdrop_amount": {
-      "$ref": "#/definitions/Uint128"
-    },
     "initial_amount": {
       "$ref": "#/definitions/Uint128"
     },

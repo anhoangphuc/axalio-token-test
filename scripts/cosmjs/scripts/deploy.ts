@@ -29,7 +29,7 @@ const main = async () => {
     const { codeId } = await senderClient.upload(sender.address, wasm, "auto", "Axalio-smart-ft");
 
     // instantiate contract
-    const instantiateMsg: InstantiateMsg = { airdrop_amount: "1000000", initial_amount: "100000000", precision: 6, subunit: "uaxa", symbol: "AXA" };
+    const instantiateMsg: InstantiateMsg = { initial_amount: "100000000", precision: 6, subunit: "uaxa", symbol: "AXA" };
     const instantiateResult = await senderClient.instantiate(sender.address, codeId, instantiateMsg, "axalio-smart-ft", "auto", {
         funds: [
             { amount: "10000000", denom: coreumDenom }
