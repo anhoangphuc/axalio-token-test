@@ -23,6 +23,14 @@
       "properties": {
         "minted_for_airdrop": {
           "type": "object",
+          "required": [
+            "user_addr"
+          ],
+          "properties": {
+            "user_addr": {
+              "type": "string"
+            }
+          },
           "additionalProperties": false
         }
       },

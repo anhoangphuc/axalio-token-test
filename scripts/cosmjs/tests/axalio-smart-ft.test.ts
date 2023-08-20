@@ -63,11 +63,11 @@ describe('Axalio smart ft', () => {
     });
 
     it(`Mint for airdrop success`, async () => {
-        const mintForAirdropMsg: ExecuteMsg = { mint_for_airdrop: { amount: "100000000", user_addr: user.address }};
+        const mintForAirdropMsg: ExecuteMsg = { mint_for_airdrop: { amount: "1000000", user_addr: user.address }};
         await wasmClient.execute(admin.address, instantiateResult.contractAddress, mintForAirdropMsg, "auto" );
-        const mintedForAirdropMsg: QueryMsg = { minted_for_airdrop: {} };
+        const mintedForAirdropMsg: QueryMsg = { minted_for_airdrop: { user_addr: user.address } };
         const mintedForAirdrop = await wasmClient.queryContractSmart(instantiateResult.contractAddress, mintedForAirdropMsg);
-        // expect(mintedForAirdrop.amount).to.be.eq("200000000");
+        expect(mintedForAirdrop.amount).to.be.eq("1000000");
     });
 
     it(`Mint for airdrop unauthorized`, async  () => {

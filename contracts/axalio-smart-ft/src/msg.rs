@@ -34,5 +34,5 @@ pub enum QueryMsg {
     Token {},
 
     #[returns(AmountResponse)]
-    MintedForAirdrop {},
+    MintedForAirdrop { user_addr: String },
 }

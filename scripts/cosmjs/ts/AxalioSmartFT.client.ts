@@ -10,7 +10,11 @@ import { Uint128, InstantiateMsg, ExecuteMsg, QueryMsg, MigrateMsg, AmountRespon
 export interface AxalioSmartFtReadOnlyInterface {
   contractAddress: string;
   token: () => Promise<TokenResponse>;
-  mintedForAirdrop: () => Promise<AmountResponse>;
+  mintedForAirdrop: ({
+    userAddr
+  }: {
+    userAddr: string;
+  }) => Promise<AmountResponse>;
 }
 export class AxalioSmartFtQueryClient implements AxalioSmartFtReadOnlyInterface {
   client: CosmWasmClient;
@@ -28,9 +32,15 @@ export class AxalioSmartFtQueryClient implements AxalioSmartFtReadOnlyInterface 
       token: {}
     });
   };
-  mintedForAirdrop = async (): Promise<AmountResponse> => {
+  mintedForAirdrop = async ({
+    userAddr
+  }: {
+    userAddr: string;
+  }): Promise<AmountResponse> => {
     return this.client.queryContractSmart(this.contractAddress, {
-      minted_for_airdrop: {}
+      minted_for_airdrop: {
+        user_addr: userAddr
+      }
     });
   };
 }

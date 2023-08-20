@@ -7,6 +7,7 @@ use cosmwasm_std::{entry_point, to_binary, Binary, Deps, QueryRequest, StdResult
 use cosmwasm_std::{Coin, DepsMut, Env, MessageInfo, Response, Uint128};
 use cw2::set_contract_version;
 use std::ops::{Add};
+use coreum_wasm_sdk::assetft::TokenResponse;
 
 const CONTRACT_NAME: &str = "axalio-ft";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -16,7 +17,7 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub fn query(deps: Deps<CoreumQueries>, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::Token {} => token(deps),
-        QueryMsg::MintedForAirdrop {} => minted_for_airdrop(deps),
+        QueryMsg::MintedForAirdrop { user_addr } => minted_for_airdrop(deps, user_addr),
     }
 }
 
@@ -57,8 +58,6 @@ pub fn instantiate(
     let state = State {
         owner: info.sender.into(),
         denom,
-        minted_for_airdrop: msg.initial_amount,
-        airdrop_amount: msg.airdrop_amount,
     };
 
     STATE.save(deps.storage, &state)?;
@@ -148,10 +147,13 @@ fn token(deps: Deps<CoreumQueries>) -> StdResult<Binary> {
     to_binary(&res)
 }
 
-fn minted_for_airdrop(deps: Deps<CoreumQueries>) -> StdResult<Binary> {
+fn minted_for_airdrop(deps: Deps<CoreumQueries>, user_addr: String) -> StdResult<Binary> {
     let state = STATE.load(deps.storage)?;
-    let res = AmountResponse {
-        amount: state.minted_for_airdrop,
+    let user_addr = deps.api.addr_validate(&user_addr)?;
+    let airdrop_amount = AIRDROP_USER.load(deps.storage, &user_addr);
+    let res = match airdrop_amount {
+        Ok(x) => AmountResponse { amount: x },
+        _Err => AmountResponse { amount: Uint128::from(0 as u128) },
     };
     to_binary(&res)
 }

@@ -23,7 +23,9 @@ export type ExecuteMsg = {
 export type QueryMsg = {
   token: {};
 } | {
-  minted_for_airdrop: {};
+  minted_for_airdrop: {
+    user_addr: string;
+  };
 };
 export type MigrateMsg = string;
 export interface AmountResponse {
