@@ -7,12 +7,12 @@
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
 import { Uint128, InstantiateMsg, ExecuteMsg, QueryMsg, MigrateMsg, AmountResponse, TokenResponse, Token } from "./AxalioSmartFT.types";
-export interface AxalioSmartFTReadOnlyInterface {
+export interface AxalioSmartFtReadOnlyInterface {
   contractAddress: string;
   token: () => Promise<TokenResponse>;
   mintedForAirdrop: () => Promise<AmountResponse>;
 }
-export class AxalioSmartFTQueryClient implements AxalioSmartFTReadOnlyInterface {
+export class AxalioSmartFtQueryClient implements AxalioSmartFtReadOnlyInterface {
   client: CosmWasmClient;
   contractAddress: string;
 
@@ -34,17 +34,19 @@ export class AxalioSmartFTQueryClient implements AxalioSmartFTReadOnlyInterface 
     });
   };
 }
-export interface AxalioSmartFTInterface extends AxalioSmartFTReadOnlyInterface {
+export interface AxalioSmartFtInterface extends AxalioSmartFtReadOnlyInterface {
   contractAddress: string;
   sender: string;
   mintForAirdrop: ({
-    amount
+    amount,
+    userAddr
   }: {
-    amount: number;
+    amount: Uint128;
+    userAddr: string;
   }, fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
   receiveAirdrop: (fee?: number | StdFee | "auto", memo?: string, _funds?: Coin[]) => Promise<ExecuteResult>;
 }
-export class AxalioSmartFTClient extends AxalioSmartFTQueryClient implements AxalioSmartFTInterface {
+export class AxalioSmartFtClient extends AxalioSmartFtQueryClient implements AxalioSmartFtInterface {
   client: SigningCosmWasmClient;
   sender: string;
   contractAddress: string;
@@ -59,13 +61,16 @@ export class AxalioSmartFTClient extends AxalioSmartFTQueryClient implements Axa
   }
 
   mintForAirdrop = async ({
-    amount
+    amount,
+    userAddr
   }: {
-    amount: number;
+    amount: Uint128;
+    userAddr: string;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, _funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       mint_for_airdrop: {
-        amount
+        amount,
+        user_addr: userAddr
       }
     }, fee, memo, _funds);
   };

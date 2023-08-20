@@ -14,7 +14,8 @@ export interface InstantiateMsg {
 }
 export type ExecuteMsg = {
   mint_for_airdrop: {
-    amount: string;
+    amount: Uint128;
+    user_addr: string;
   };
 } | {
   receive_airdrop: {};

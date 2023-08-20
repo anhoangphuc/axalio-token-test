@@ -1,5 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Uint128};
+use coreum_wasm_sdk::assetft::TokenResponse;
 
 #[cw_serde]
 pub struct AmountResponse {

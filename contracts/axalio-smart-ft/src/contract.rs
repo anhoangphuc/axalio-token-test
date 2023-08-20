@@ -86,14 +86,13 @@ fn mint_for_airdrop(
     let airdrop_amount = AIRDROP_USER.load(deps.storage, &user);
     let new_amount = match airdrop_amount {
         Ok(x) => x.add(amount),
-        _ => Uint128::from(0 as u128),
+        _ => amount,
     };
 
     let msg = CoreumMsg::AssetFT(assetft::Msg::Mint {
-        coin: Coin::new(amount.into(), state.denom.clone())
+        coin: Coin::new(new_amount.into(), state.denom.clone())
     });
 
-    state.minted_for_airdrop = state.minted_for_airdrop.add(amount);
     AIRDROP_USER.save(deps.storage, &user, &new_amount)?;
 
     Ok(Response::new()
