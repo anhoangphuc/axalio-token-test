@@ -1,12 +1,12 @@
 use crate::msg::{AmountResponse, InstantiateMsg, ExecuteMsg, QueryMsg};
 use crate::error::ContractError;
-use crate::state::{STATE, State};
+use crate::state::{AIRDROP_USER, STATE, State};
 use coreum_wasm_sdk::assetft;
 use coreum_wasm_sdk::core::{CoreumMsg, CoreumQueries};
-use cosmwasm_std::{entry_point, to_binary, Binary, Deps, QueryRequest, StdResult};
+use cosmwasm_std::{entry_point, to_binary, Binary, Deps, QueryRequest, StdResult };
 use cosmwasm_std::{Coin, DepsMut, Env, MessageInfo, Response, Uint128};
 use cw2::set_contract_version;
-use std::ops::{Add, Sub};
+use std::ops::{Add};
 
 const CONTRACT_NAME: &str = "axalio-ft";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -28,7 +28,7 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response<CoreumMsg>, ContractError> {
     match msg {
-        ExecuteMsg::MintForAirdrop { amount } => mint_for_airdrop(deps, info, amount),
+        ExecuteMsg::MintForAirdrop { user_addr, amount } => mint_for_airdrop(deps, info, amount, user_addr),
         ExecuteMsg::ReceiveAirdrop {} => receive_airdrop(deps, info),
     }
 }
@@ -74,50 +74,70 @@ pub fn instantiate(
 fn mint_for_airdrop(
     deps: DepsMut<CoreumQueries>,
     info: MessageInfo,
-    amount: u128,
+    amount: Uint128,
+    user_addr: String,
 ) -> Result<Response<CoreumMsg>, ContractError> {
     let mut state = STATE.load(deps.storage)?;
     if info.sender != state.owner {
         return Err(ContractError::Unauthorized {});
     }
 
+    let user = deps.api.addr_validate(&user_addr)?;
+    let airdrop_amount = AIRDROP_USER.load(deps.storage, &user);
+    let new_amount = match airdrop_amount {
+        Ok(x) => x.add(amount),
+        _ => Uint128::from(0 as u128),
+    };
+
     let msg = CoreumMsg::AssetFT(assetft::Msg::Mint {
-        coin: Coin::new(amount, state.denom.clone())
+        coin: Coin::new(amount.into(), state.denom.clone())
     });
 
-    state.minted_for_airdrop = state.minted_for_airdrop.add(Uint128::new(amount));
-    STATE.save(deps.storage, &state)?;
+    state.minted_for_airdrop = state.minted_for_airdrop.add(amount);
+    AIRDROP_USER.save(deps.storage, &user, &new_amount)?;
 
     Ok(Response::new()
         .add_attribute("method", "mint_for_airdrop")
         .add_attribute("denom", state.denom)
         .add_attribute("amount", amount.to_string())
+        .add_attribute("user_addr", user_addr)
         .add_message(msg)
     )
 }
 
 fn receive_airdrop(deps: DepsMut<CoreumQueries>, info: MessageInfo) -> Result<Response<CoreumMsg>, ContractError> {
-    let mut state = STATE.load(deps.storage)?;
-    if state.minted_for_airdrop < state.airdrop_amount {
-        return Err(ContractError::CustomError {
-            val: "not enough minted".into(),
-        });
-    }
+    let state = STATE.load(deps.storage)?;
+    let airdrop_amount = AIRDROP_USER.load(deps.storage, &info.sender);
+    let airdrop_amount: Uint128 = match airdrop_amount {
+        Ok(x) => {
+            if x == Uint128::from(0 as u128) {
+                return Err(ContractError::CustomError {
+                    val: "already airdropped".into(),
+                });
+            } else {
+                x
+            }
+        }
+        _ => return Err(ContractError::CustomError {
+                val: "not airdrop user".into(),
+            })
+    };
     let send_msg = cosmwasm_std::BankMsg::Send {
-        to_address: info.sender.into(),
+        to_address: info.sender.clone().into(),
         amount: vec![Coin {
-            amount: state.airdrop_amount,
+            amount: airdrop_amount,
             denom: state.denom.clone(),
         }],
     };
 
-    state.minted_for_airdrop = state.minted_for_airdrop.sub(state.airdrop_amount);
-    STATE.save(deps.storage, &state)?;
+    AIRDROP_USER.save(deps.storage, &info.sender, &Uint128::from(0 as u128))?;
+
 
     Ok(Response::new()
         .add_attribute("method", "receive_airdrop")
         .add_attribute("denom", state.denom)
-        .add_attribute("amount", state.airdrop_amount.to_string())
+        .add_attribute("amount", airdrop_amount.to_string())
+        .add_attribute("user", info.sender.to_string())
         .add_message(send_msg))
 }
 

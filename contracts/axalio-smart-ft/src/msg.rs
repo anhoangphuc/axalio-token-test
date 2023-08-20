@@ -1,6 +1,5 @@
-use coreum_wasm_sdk::assetft::TokenResponse;
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::Uint128;
+use cosmwasm_std::{Uint128};
 
 #[cw_serde]
 pub struct AmountResponse {
@@ -23,7 +22,7 @@ pub enum MigrateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    MintForAirdrop { amount: u128 },
+    MintForAirdrop { user_addr: String, amount: Uint128 },
     ReceiveAirdrop {},
 }
 
